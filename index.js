@@ -4,6 +4,8 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.STREAK_API_KEY;
+console.log('API_KEY:', API_KEY ? '[set]' : '[NOT SET]');
+
 
 app.use(express.json());
 
