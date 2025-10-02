@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.STREAK_API_KEY;
 const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
 const NEXT_KEY = process.env.NEXT_API_KEY;
-cosnt NEXT_BASE = 'https://api.nextcenturymeters.com/api'
+const NEXT_BASE = 'https://api.nextcenturymeters.com/api'
 
 console.log('API_KEY:', API_KEY ? '[set]' : '[NOT SET]');
 
