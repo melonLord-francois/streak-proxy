@@ -130,15 +130,6 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
 
     const toRevoke = await getCollection('toRevoke');
 
-    const doc = {
-      _id,
-      propertyId,
-      revokeDate: new Date(revokeDate),
-      users,
-      companies,
-      createdAt: new Date(),
-    };
-
     await toRevoke.updateOne(
       { _id },
       {
@@ -154,7 +145,30 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
       { upsert: true }
     );
 
+    // Create a task in the Streak box
+    const userList = users.length ? users.join(', ') : 'no users';
+    const companyList = companies.length ? companies.join(', ') : 'no companies';
+    const revokeDateStr = new Date(revokeDate).toISOString();
 
+    const taskMessage = `Extension has scheduled revocation for users: [${userList}] and companies: [${companyList}] on ${new Date(revokeDate).toLocaleDateString()}.`;
+
+    const taskResponse = await fetch(`${STREAK_BASE_URL}/boxes/${_id}/tasks`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + Buffer.from(`${STREAK_API_KEY}:`).toString('base64'),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        note: taskMessage,
+        dueDate: revokeDateStr,
+      }),
+    });
+
+    if (!taskResponse.ok) {
+      console.warn(`⚠️ Failed to create task in Streak box ${_id}: ${taskResponse.status}`);
+    } else {
+      console.log(`✅ Created revocation task in Streak box ${_id}`);
+    }
 
     res.set('Access-Control-Allow-Origin', '*'); // CORS
     res.json({ success: true, message: 'Revocation scheduled successfully' });
@@ -162,6 +176,7 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
     res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
+
 
 
 
