@@ -5,13 +5,19 @@
 
 require('dotenv').config(); // Make sure this is at the top
 const { getCollection } = require('./mongo'); // Or adjust path if different
+const { connectToMongo } = require('./mongo');
+
+
 
 const express = require('express');
 const fetch = require('node-fetch');
 const app = express();
 const cors = require('cors'); // <-- import cors
 
-
+connectToMongo().catch(err => {
+  console.error('Failed to connect to MongoDB during startup', err);
+  process.exit(1); // Exit if DB connection fails at startup
+});
 
 const PORT = process.env.PORT || 3000;
 const STREAK_API_KEY = process.env.STREAK_API_KEY;
