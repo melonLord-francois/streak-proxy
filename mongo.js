@@ -1,6 +1,16 @@
 const { MongoClient } = require('mongodb');
 
 const mongoUri = process.env.MONGO_URI;
+
+
+if (!mongoUri) {
+  console.error('❌ MONGO_URI environment variable is not set!');
+  process.exit(1); // stop app early if no URI
+}
+
+console.log('Using Mongo URI:', mongoUri);
+
+
 const client = new MongoClient(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
