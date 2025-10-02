@@ -25,7 +25,7 @@ const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
 const NEXT_API_TOKEN = process.env.NEXT_API_TOKEN;
 const NEXT_BASE = 'https://api.nextcenturymeters.com/api'
 
-console.log('STRAK_API_KEY:', STREAK_API_KEY ? '[set]' : '[NOT SET]');
+console.log('STREAK_API_KEY:', STREAK_API_KEY ? '[set]' : '[NOT SET]');
 
 app.use(express.json());
 app.use(cors()); // <-- enable CORS for all routes and origins
@@ -121,25 +121,38 @@ app.get('/sharedaccess/:id', async (req, res) => {
 
 app.post('/schedule-revoke', express.json(), async (req, res) => {
   try {
-    const { boxKey, propertyId, revokeDate, users, companies } = req.body;
+    const { _id, propertyId, revokeDate, users, companies } = req.body;
 
     // Basic validation
-    if (!boxKey || !propertyId || !revokeDate) {
+    if (!_id || !propertyId || !revokeDate) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const toRevoke = await getCollection('toRevoke');
 
     const doc = {
-      boxKey,
+      _id,
       propertyId,
       revokeDate: new Date(revokeDate),
       users,
       companies,
       createdAt: new Date(),
     };
+    
+    await collection.updateOne(
+      { _id: boxKey }, // same _id from your payload
+      {
+        $set: {
+          propertyId,
+          revokeDate: new Date(revokeDate),
+          users,
+          companies,
+          createdAt: new Date(),
+        },
+      },
+      { upsert: true }
+    );
 
-    const result = await toRevoke.insertOne(doc);
 
     res.set('Access-Control-Allow-Origin', '*'); // CORS
     res.json({ success: true, message: 'Revocation scheduled successfully' });
