@@ -12,6 +12,17 @@ console.log('API_KEY:', API_KEY ? '[set]' : '[NOT SET]');
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Version');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+
 app.get('/boxes/:boxKey', async (req, res) => {
   const boxKey = req.params.boxKey;
 
