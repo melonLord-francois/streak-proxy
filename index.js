@@ -148,18 +148,21 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
     // Create a task in the Streak box
     const userList = users.length ? users.join(', ') : 'no users';
     const companyList = companies.length ? companies.join(', ') : 'no companies';
-    const revokeDateStr = new Date(revokeDate).toISOString();
+    const revokeDateStr = new Date(revokeDate).getTime();
+;
 
     const taskMessage = `Extension has scheduled revocation for users: [${userList}] and companies: [${companyList}] on ${new Date(revokeDate).toLocaleDateString()}.`;
 
     const taskResponse = await fetch(`${STREAK_BASE_URL}/boxes/${_id}/tasks`, {
       method: 'POST',
       headers: {
+        accept: 'application/json',
         Authorization: 'Basic ' + Buffer.from(`${STREAK_API_KEY}:`).toString('base64'),
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        note: taskMessage,
+        key: _id,
+        text: taskMessage,
         dueDate: revokeDateStr,
       }),
     });
