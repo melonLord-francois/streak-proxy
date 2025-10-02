@@ -4,16 +4,18 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.STREAK_API_KEY;
-console.log('API_KEY:', API_KEY ? '[set]' : '[NOT SET]');
+const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
 
+console.log('API_KEY:', API_KEY ? '[set]' : '[NOT SET]');
 
 app.use(express.json());
 
+// Existing boxes route
 app.get('/boxes/:boxKey', async (req, res) => {
   const boxKey = req.params.boxKey;
 
   try {
-    const response = await fetch(`https://api.streak.com/api/v1/boxes/${boxKey}`, {
+    const response = await fetch(`${STREAK_BASE_URL}/boxes/${boxKey}`, {
       headers: {
         Authorization: 'Basic ' + Buffer.from(`${API_KEY}:`).toString('base64')
       }
@@ -33,26 +35,11 @@ app.get('/boxes/:boxKey', async (req, res) => {
   }
 });
 
-
-
-const express = require('express');
-const fetch = require('node-fetch');
-const app = express();
-
-const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.STREAK_API_KEY;
-const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
-
-// Your existing /boxes/:boxKey route here...
-
 // New route to get users by id
 app.get('/users/:id', async (req, res) => {
   const id = req.params.id;
 
   try {
-    // Replace this URL with the actual API you want to call with the id
-    // For example: `https://app.nextcenturymeters.com/api/users/${id}`
-    // Or if you want to proxy through your backend (recommended)
     const response = await fetch(`https://app.nextcenturymeters.com/api/users/${id}`, {
       headers: {
         // Add any required headers here, e.g., Authorization if needed
@@ -64,7 +51,7 @@ app.get('/users/:id', async (req, res) => {
     }
 
     const data = await response.json();
-    // Send back users data
+
     res.set('Access-Control-Allow-Origin', '*'); // CORS
     res.json(data);
   } catch (error) {
@@ -72,12 +59,11 @@ app.get('/users/:id', async (req, res) => {
   }
 });
 
-// New route to get shared access companies by id
+// New route to get companies with access by id
 app.get('/sharedaccess/:id', async (req, res) => {
   const id = req.params.id;
 
   try {
-    // Replace with actual API URL for companies with access
     const response = await fetch(`https://app.nextcenturymeters.com/api/companieswithaccess/${id}`, {
       headers: {
         // Add any required headers here
@@ -89,7 +75,7 @@ app.get('/sharedaccess/:id', async (req, res) => {
     }
 
     const data = await response.json();
-    // Send back companies data
+
     res.set('Access-Control-Allow-Origin', '*'); // CORS
     res.json(data);
   } catch (error) {
@@ -100,4 +86,3 @@ app.get('/sharedaccess/:id', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Streak proxy running on port ${PORT}`);
 });
-
