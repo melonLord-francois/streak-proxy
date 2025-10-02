@@ -1,6 +1,9 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const app = express();
+const cors = require('cors'); // <-- import cors
+
+
 
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.STREAK_API_KEY;
@@ -11,16 +14,9 @@ const NEXT_BASE = 'https://api.nextcenturymeters.com/api'
 console.log('API_KEY:', API_KEY ? '[set]' : '[NOT SET]');
 
 app.use(express.json());
+app.use(cors()); // <-- enable CORS for all routes and origins
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Version');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+
 
 
 app.get('/boxes/:boxKey', async (req, res) => {
@@ -74,7 +70,6 @@ app.get('/users/:id', async (req, res) => {
 
 app.get('/sharedaccess/:id', async (req, res) => {
   const id = `p_${req.params.id}`;
-  console.log('Fetched companies response:', await response.text());
 
 
   try {
@@ -83,7 +78,11 @@ app.get('/sharedaccess/:id', async (req, res) => {
         Authorization: NEXT_KEY,
         Version: 2
       }
-    });
+
+
+    }
+    );
+    console.log('Fetched companies response:', await response.text());
 
     if (!response.ok) {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
