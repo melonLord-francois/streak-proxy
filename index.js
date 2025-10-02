@@ -58,9 +58,11 @@ app.get('/users/:id', async (req, res) => {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
     
-    console.log('Fetched users response:', response.text());
+    const text = await response.text();
+    console.log('Fetched users response:', text);
 
-    const data = await response.json();
+    const data = JSON.parse(text);
+
 
     res.set('Access-Control-Allow-Origin', '*'); // CORS
     res.json(data);
@@ -88,10 +90,11 @@ app.get('/sharedaccess/:id', async (req, res) => {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
 
-    console.log('Fetched companies response:', response.text());
+    const text = await response.text();
+    console.log('Fetched users response:', text);
 
+    const data = JSON.parse(text);
 
-    const data = await response.json();
 
     res.set('Access-Control-Allow-Origin', '*'); // CORS
     res.json(data);
