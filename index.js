@@ -138,20 +138,22 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
       companies,
       createdAt: new Date(),
     };
-    
-    await collection.updateOne(
-      { _id: boxKey }, // same _id from your payload
+
+    await toRevoke.updateOne(
+      { _id },
       {
         $set: {
           propertyId,
           revokeDate: new Date(revokeDate),
           users,
           companies,
-          createdAt: new Date(),
+          updatedAt: new Date(),
         },
+        $setOnInsert: { createdAt: new Date() },
       },
       { upsert: true }
     );
+
 
 
     res.set('Access-Control-Allow-Origin', '*'); // CORS
