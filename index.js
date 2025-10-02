@@ -48,6 +48,8 @@ app.get('/boxes/:boxKey', async (req, res) => {
 
 app.get('/users/:id', async (req, res) => {
   const id = `p_${req.params.id}`;
+  console.log('Fetched users response:', await response.text());
+
 
   try {
     const response = await fetch(`${NEXT_BASE}/Properties/${id}/Users`, {
@@ -72,6 +74,8 @@ app.get('/users/:id', async (req, res) => {
 
 app.get('/sharedaccess/:id', async (req, res) => {
   const id = `p_${req.params.id}`;
+  console.log('Fetched companies response:', await response.text());
+
 
   try {
     const response = await fetch(`${NEXT_BASE}/Properties/${id}/CompaniesWithPermissionOnMe`, {
