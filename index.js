@@ -44,7 +44,6 @@ app.get('/boxes/:boxKey', async (req, res) => {
 
 app.get('/users/:id', async (req, res) => {
   const id = `p_${req.params.id}`;
-  console.log('Fetched users response:', await response.text());
 
 
   try {
@@ -58,6 +57,8 @@ app.get('/users/:id', async (req, res) => {
     if (!response.ok) {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
+    
+    console.log('Fetched users response:', response.text());
 
     const data = await response.json();
 
@@ -82,11 +83,13 @@ app.get('/sharedaccess/:id', async (req, res) => {
 
     }
     );
-    console.log('Fetched companies response:', await response.text());
 
     if (!response.ok) {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
+
+    console.log('Fetched companies response:', response.text());
+
 
     const data = await response.json();
 
