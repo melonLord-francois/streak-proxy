@@ -11,10 +11,7 @@ if (!mongoUri) {
 console.log('Using Mongo URI:', mongoUri);
 
 
-const client = new MongoClient(mongoUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const client = new MongoClient(mongoUri);
 
 let db;
 
