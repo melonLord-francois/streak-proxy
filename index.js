@@ -22,6 +22,7 @@ connectToMongo().catch(err => {
 const PORT = process.env.PORT || 3000;
 const STREAK_API_KEY = process.env.STREAK_API_KEY;
 const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
+const STREAK_BASE_URL_2 = 'https://api.streak.com/api/v2';
 const NEXT_API_TOKEN = process.env.NEXT_API_TOKEN;
 const NEXT_BASE = 'https://api.nextcenturymeters.com/api'
 
@@ -145,7 +146,6 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
       { upsert: true }
     );
 
-    // Create a task in the Streak box
     const userList = users.length ? users.join(', ') : 'no users';
     const companyList = companies.length ? companies.join(', ') : 'no companies';
     const revokeDateStr = new Date(revokeDate).getTime();
@@ -153,7 +153,7 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
 
     const taskMessage = `Extension has scheduled revocation for users: [${userList}] and companies: [${companyList}] on ${new Date(revokeDate).toLocaleDateString()}.`;
 
-    const taskResponse = await fetch(`${STREAK_BASE_URL}/boxes/${_id}/tasks`, {
+    const taskResponse = await fetch(`${STREAK_BASE_URL_2}/boxes/${_id}/tasks`, {
       method: 'POST',
       headers: {
         accept: 'application/json',
