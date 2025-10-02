@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-const API_KEY = 'strk_3ktPYHqMyVMeVdV2Re1nX6f3nlmR';
+const API_KEY = process.env.STREAK_API_KEY;
 
 app.use(express.json());
 
