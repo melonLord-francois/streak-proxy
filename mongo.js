@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const mongoUri = process.env.MONGO_URI; // Set this in your environment variables
+const mongoUri = process.env.MONGO_URI;
 const client = new MongoClient(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -13,7 +13,7 @@ async function connectToMongo() {
     try {
       await client.connect();
       console.log('✅ Connected to MongoDB');
-      db = client.db('yourDatabaseName'); // Replace with your actual DB name
+      db = client.db('revoke-scheduler'); // Replace with your actual DB name
     } catch (err) {
       console.error('❌ MongoDB connection error:', err);
       throw err;
