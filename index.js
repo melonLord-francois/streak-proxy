@@ -6,9 +6,9 @@ const cors = require('cors'); // <-- import cors
 
 
 const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.STREAK_API_KEY;
+const STREAK_API_KEY = process.env.STREAK_API_KEY;
 const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
-const NEXT_KEY = process.env.NEXT_API_KEY;
+const NEXT_API_TOKEN = process.env.NEXT_API_TOKEN;
 const NEXT_BASE = 'https://api.nextcenturymeters.com/api'
 
 console.log('API_KEY:', API_KEY ? '[set]' : '[NOT SET]');
@@ -25,7 +25,7 @@ app.get('/boxes/:boxKey', async (req, res) => {
   try {
     const response = await fetch(`${STREAK_BASE_URL}/boxes/${boxKey}`, {
       headers: {
-        Authorization: 'Basic ' + Buffer.from(`${API_KEY}:`).toString('base64')
+        Authorization: 'Basic ' + Buffer.from(`${STREAK_API_KEY}:`).toString('base64')
       }
     });
 
@@ -49,7 +49,7 @@ app.get('/users/:id', async (req, res) => {
   try {
     const response = await fetch(`${NEXT_BASE}/Properties/${id}/Users`, {
       headers: {
-        Authorization: NEXT_KEY,
+        Authorization: NEXT_API_TOKEN,
         Version: 2
       }
     });
@@ -76,7 +76,7 @@ app.get('/sharedaccess/:id', async (req, res) => {
   try {
     const response = await fetch(`${NEXT_BASE}/Properties/${id}/CompaniesWithPermissionOnMe`, {
       headers: {
-        Authorization: NEXT_KEY,
+        Authorization: NEXT_API_TOKEN,
         Version: 2
       }
 
