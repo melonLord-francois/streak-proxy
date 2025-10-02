@@ -5,12 +5,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.STREAK_API_KEY;
 const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
+const NEXT_KEY = process.env.NEXT_API_KEY;
+cosnt NEXT_BASE = 'https://api.nextcenturymeters.com/api'
 
 console.log('API_KEY:', API_KEY ? '[set]' : '[NOT SET]');
 
 app.use(express.json());
 
-// Existing boxes route
 app.get('/boxes/:boxKey', async (req, res) => {
   const boxKey = req.params.boxKey;
 
@@ -27,7 +28,6 @@ app.get('/boxes/:boxKey', async (req, res) => {
 
     const data = await response.json();
 
-    // Allow CORS so your extension can call this endpoint
     res.set('Access-Control-Allow-Origin', '*');
     res.json(data);
   } catch (error) {
@@ -35,14 +35,14 @@ app.get('/boxes/:boxKey', async (req, res) => {
   }
 });
 
-// New route to get users by id
 app.get('/users/:id', async (req, res) => {
-  const id = req.params.id;
+  const id = `p_${req.params.id}`;
 
   try {
-    const response = await fetch(`https://app.nextcenturymeters.com/api/users/${id}`, {
+    const response = await fetch(`${NEXT_BASE}/Properties/${id}/Users`, {
       headers: {
-        // Add any required headers here, e.g., Authorization if needed
+        Authorization: NEXT_KEY,
+        Version: 2
       }
     });
 
@@ -59,14 +59,14 @@ app.get('/users/:id', async (req, res) => {
   }
 });
 
-// New route to get companies with access by id
 app.get('/sharedaccess/:id', async (req, res) => {
-  const id = req.params.id;
+  const id = `p_${req.params.id}`;
 
   try {
-    const response = await fetch(`https://app.nextcenturymeters.com/api/companieswithaccess/${id}`, {
+    const response = await fetch(`${NEXT_BASE}/Properties/${id}/CompaniesWithPermissionOnMe`, {
       headers: {
-        // Add any required headers here
+        Authorization: NEXT_KEY,
+        Version: 2
       }
     });
 
