@@ -1,3 +1,11 @@
+// atlas cluster creds
+// fboulou_db_user
+// JtyrRZjbWwwMP02D
+
+
+require('dotenv').config(); // Make sure this is at the top
+const { getCollection } = require('./mongo'); // Or adjust path if different
+
 const express = require('express');
 const fetch = require('node-fetch');
 const app = express();
@@ -57,7 +65,7 @@ app.get('/users/:id', async (req, res) => {
     if (!response.ok) {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
-    
+
     const text = await response.text();
     console.log('Fetched users response:', text);
 
@@ -102,6 +110,38 @@ app.get('/sharedaccess/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
+
+
+
+app.post('/schedule-revoke', express.json(), async (req, res) => {
+  try {
+    const { boxKey, propertyId, revokeDate, users, companies } = req.body;
+
+    // Basic validation
+    if (!boxKey || !propertyId || !revokeDate) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const toRevoke = await getCollection('toRevoke');
+
+    const doc = {
+      boxKey,
+      propertyId,
+      revokeDate: new Date(revokeDate),
+      users,
+      companies,
+      createdAt: new Date(),
+    };
+
+    const result = await toRevoke.insertOne(doc);
+
+    res.set('Access-Control-Allow-Origin', '*'); // CORS
+    res.json({ success: true, message: 'Revocation scheduled successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
 
 
 app.listen(PORT, '0.0.0.0', () => {
