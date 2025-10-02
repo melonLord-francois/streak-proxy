@@ -33,6 +33,71 @@ app.get('/boxes/:boxKey', async (req, res) => {
   }
 });
 
+
+
+const express = require('express');
+const fetch = require('node-fetch');
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+const API_KEY = process.env.STREAK_API_KEY;
+const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
+
+// Your existing /boxes/:boxKey route here...
+
+// New route to get users by id
+app.get('/users/:id', async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Replace this URL with the actual API you want to call with the id
+    // For example: `https://app.nextcenturymeters.com/api/users/${id}`
+    // Or if you want to proxy through your backend (recommended)
+    const response = await fetch(`https://app.nextcenturymeters.com/api/users/${id}`, {
+      headers: {
+        // Add any required headers here, e.g., Authorization if needed
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).json({ error: `External API error ${response.status}` });
+    }
+
+    const data = await response.json();
+    // Send back users data
+    res.set('Access-Control-Allow-Origin', '*'); // CORS
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// New route to get shared access companies by id
+app.get('/sharedaccess/:id', async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Replace with actual API URL for companies with access
+    const response = await fetch(`https://app.nextcenturymeters.com/api/companieswithaccess/${id}`, {
+      headers: {
+        // Add any required headers here
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).json({ error: `External API error ${response.status}` });
+    }
+
+    const data = await response.json();
+    // Send back companies data
+    res.set('Access-Control-Allow-Origin', '*'); // CORS
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Streak proxy running on port ${PORT}`);
 });
+
