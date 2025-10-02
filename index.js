@@ -11,7 +11,7 @@ const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
 const NEXT_API_TOKEN = process.env.NEXT_API_TOKEN;
 const NEXT_BASE = 'https://api.nextcenturymeters.com/api'
 
-console.log('API_KEY:', API_KEY ? '[set]' : '[NOT SET]');
+console.log('STRAK_API_KEY:', STREAK_API_KEY ? '[set]' : '[NOT SET]');
 
 app.use(express.json());
 app.use(cors()); // <-- enable CORS for all routes and origins
