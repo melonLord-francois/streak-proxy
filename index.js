@@ -58,7 +58,7 @@ app.get('/boxes/:boxKey', async (req, res) => {
 });
 
 app.get('/users/:id', async (req, res) => {
-  const id = `p_${req.params.id}`;
+  const id = req.params.id;
 
 
   try {
@@ -87,7 +87,7 @@ app.get('/users/:id', async (req, res) => {
 });
 
 app.get('/sharedaccess/:id', async (req, res) => {
-  const id = `p_${req.params.id}`;
+  const id = req.params.id;
 
 
   try {
