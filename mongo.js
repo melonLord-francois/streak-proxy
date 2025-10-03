@@ -31,11 +31,10 @@ async function connectToMongo() {
 
 // mongo.js addition
 async function closeMongoConnection() {
-  if (client.isConnected()) {
-    await client.close();
-    console.log('✅ MongoDB connection closed');
-  }
+  await client.close();
+  console.log('✅ MongoDB connection closed');
 }
+
 
 
 
