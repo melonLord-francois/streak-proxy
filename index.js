@@ -45,6 +45,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store'); // prevent 304s, always send fresh
+  next();
+});
+
 
 
 
