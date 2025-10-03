@@ -31,8 +31,17 @@ console.log('STREAK_API_KEY:', STREAK_API_KEY ? '[set]' : '[NOT SET]');
 
 app.use(express.json());
 app.use(cors()); // <-- enable CORS for all routes and origins
+app.set('etag', false); // <-- disable ETag (stop Express sending 304)
+
 
 // ✅ Logging middleware: logs method, path, status, and response time
+
+
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store'); // prevent 304s, always send fresh
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
 
@@ -44,12 +53,6 @@ app.use((req, res, next) => {
 
   next();
 });
-
-app.use((req, res, next) => {
-  res.set('Cache-Control', 'no-store'); // prevent 304s, always send fresh
-  next();
-});
-
 
 
 
@@ -92,6 +95,9 @@ app.get('/users/:id', async (req, res) => {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
 
+    console.log(`${label} status:`, response.status);
+
+
     const text = await response.text();
     console.log('Fetched users response:', text);
 
@@ -104,6 +110,7 @@ app.get('/users/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
+
 
 app.get('/sharedaccess/:id', async (req, res) => {
   const id = req.params.id;
@@ -120,6 +127,9 @@ app.get('/sharedaccess/:id', async (req, res) => {
     if (!response.ok) {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
+
+    console.log(`${label} status:`, response.status);
+
 
     const text = await response.text();
     console.log('Fetched companies response:', text);
