@@ -36,9 +36,6 @@ async function closeMongoConnection() {
 }
 
 
-
-
-
 module.exports = {
   connectToMongo,
   getCollection: async (collectionName) => {

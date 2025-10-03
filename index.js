@@ -32,6 +32,17 @@ console.log('STREAK_API_KEY:', STREAK_API_KEY ? '[set]' : '[NOT SET]');
 app.use(express.json());
 app.use(cors()); // <-- enable CORS for all routes and origins
 
+// ✅ Logging middleware: logs method, path, status, and response time
+app.use((req, res, next) => {
+  const start = Date.now();
+
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`${req.method} ${req.originalUrl} ➜ ${res.statusCode} (${duration}ms)`);
+  });
+
+  next();
+});
 
 
 
@@ -97,22 +108,19 @@ app.get('/sharedaccess/:id', async (req, res) => {
         Authorization: NEXT_API_TOKEN,
         Version: 2
       }
-
-
-    }
-    );
+    });
 
     if (!response.ok) {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
 
     const text = await response.text();
-    console.log('Fetched users response:', text);
+    console.log('Fetched companies response:', text);
 
     const data = JSON.parse(text);
 
 
-    res.set('Access-Control-Allow-Origin', '*'); // CORS
+    res.set('Access-Control-Allow-Origin', '*'); 
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error', details: error.message });
