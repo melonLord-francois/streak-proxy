@@ -119,18 +119,60 @@ app.get('/sharedaccess/:id', async (req, res) => {
 });
 
 
-
 app.post('/schedule-revoke', express.json(), async (req, res) => {
   try {
-    const { _id, propertyId, revokeDate, users, companies } = req.body;
+    const { _id, propertyId, revokeDate, users = [], companies = [] } = req.body;
 
-    // Basic validation
     if (!_id || !propertyId || !revokeDate) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const toRevoke = await getCollection('toRevoke');
 
+    // Prepare arrays to hold created task IDs
+    const userTasks = [];
+    const companyTasks = [];
+
+    const revokeDateMs = new Date(revokeDate).getTime();
+
+    // Helper to create a task and return the task ID
+    async function createTask(boxId, text) {
+      const res = await fetch(`${STREAK_BASE_URL}/boxes/${boxId}/tasks`, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Basic ' + Buffer.from(`${STREAK_API_KEY}:`).toString('base64'),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          key: boxId,
+          text,
+          dueDate: revokeDateMs,
+        }),
+      });
+
+      if (!res.ok) {
+        console.warn(`⚠️ Failed to create task "${text}" for box ${boxId}: ${res.status}`);
+        return null;
+      }
+
+      const data = await res.json();
+      console.log(`✅ Created task "${text}" with ID: ${data.key} for box ${boxId}`);
+      return data.key; // task ID returned by Streak API
+    }
+
+    // Create tasks for users, collect their task IDs
+    for (const userId of users) {
+      const taskId = await createTask(_id, `Revoke access for user: ${userId}`);
+      if (taskId) userTasks.push({ userId, taskId });
+    }
+
+    // Create tasks for companies, collect their task IDs
+    for (const companyId of companies) {
+      const taskId = await createTask(_id, `Revoke access for company: ${companyId}`);
+      if (taskId) companyTasks.push({ companyId, taskId });
+    }
+
+    // Upsert the document with task IDs included
     await toRevoke.updateOne(
       { _id },
       {
@@ -139,6 +181,8 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
           revokeDate: new Date(revokeDate),
           users,
           companies,
+          userTasks,
+          companyTasks,
           updatedAt: new Date(),
         },
         $setOnInsert: { createdAt: new Date() },
@@ -146,39 +190,16 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
       { upsert: true }
     );
 
-    const userList = users.length ? users.join(', ') : 'no users';
-    const companyList = companies.length ? companies.join(', ') : 'no companies';
-    const revokeDateStr = new Date(revokeDate).getTime();
-;
-
-    const taskMessage = `Extension has scheduled revocation for users: [${userList}] and companies: [${companyList}] on ${new Date(revokeDate).toLocaleDateString()}.`;
-
-    const taskResponse = await fetch(`${STREAK_BASE_URL_2}/boxes/${_id}/tasks`, {
-      method: 'POST',
-      headers: {
-        accept: 'application/json',
-        Authorization: 'Basic ' + Buffer.from(`${STREAK_API_KEY}:`).toString('base64'),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        key: _id,
-        text: taskMessage,
-        dueDate: revokeDateStr,
-      }),
-    });
-
-    if (!taskResponse.ok) {
-      console.warn(`⚠️ Failed to create task in Streak box ${_id}: ${taskResponse.status}`);
-    } else {
-      console.log(`✅ Created revocation task in Streak box ${_id}`);
-    }
-
-    res.set('Access-Control-Allow-Origin', '*'); // CORS
-    res.json({ success: true, message: 'Revocation scheduled successfully' });
+    res.set('Access-Control-Allow-Origin', '*');
+    res.json({ success: true, message: 'Revocation scheduled successfully', userTasks, companyTasks });
   } catch (error) {
+    console.error('❌ schedule-revoke error:', error);
     res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
+
+
+
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Streak proxy running on port ${PORT}`);
