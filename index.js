@@ -38,11 +38,13 @@ app.use((req, res, next) => {
 
   res.on('finish', () => {
     const duration = Date.now() - start;
-    console.log(`${req.method} ${req.originalUrl} ➜ ${res.statusCode} (${duration}ms)`);
+
+    console.log(`${req.method} ${req.originalUrl} ➜ ${res.statusCode} (${duration}ms) | IP: ${req.ip} | UA: ${req.headers['user-agent']}`);
   });
 
   next();
 });
+
 
 
 
