@@ -137,10 +137,11 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
 
     // Helper to create a task and return the task ID
     async function createTask(boxId, text) {
-      const res = await fetch(`${STREAK_BASE_URL}/boxes/${boxId}/tasks`, {
+      const res = await fetch(`${STREAK_BASE_URL_2}/boxes/${boxId}/tasks`, {
         method: 'POST',
         headers: {
           Authorization: 'Basic ' + Buffer.from(`${STREAK_API_KEY}:`).toString('base64'),
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
