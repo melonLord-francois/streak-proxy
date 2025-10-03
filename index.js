@@ -95,7 +95,7 @@ app.get('/users/:id', async (req, res) => {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
 
-    console.log(`${label} status:`, response.status);
+    console.log(`status:`, response.status);
 
 
     const text = await response.text();
@@ -128,7 +128,7 @@ app.get('/sharedaccess/:id', async (req, res) => {
       return res.status(response.status).json({ error: `External API error ${response.status}` });
     }
 
-    console.log(`${label} status:`, response.status);
+    console.log(`status:`, response.status);
 
 
     const text = await response.text();
