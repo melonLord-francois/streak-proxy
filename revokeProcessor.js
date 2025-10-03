@@ -1,6 +1,6 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
-const { connectToMongo, getCollection } = require('./mongo');
+const { connectToMongo, getCollection, closeMongoConnection } = require('./mongo');
 
 const STREAK_API_KEY = process.env.STREAK_API_KEY;
 const STREAK_BASE_URL = 'https://api.streak.com/api/v1';
@@ -102,6 +102,9 @@ async function processRevocations() {
     }
   } catch (err) {
     console.error('❌ Error processing revocations:', err);
+  } finally {
+    await closeMongoConnection();
+    process.exit(0); // Ensure the script exits cleanly
   }
 }
 

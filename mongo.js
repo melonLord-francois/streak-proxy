@@ -29,10 +29,22 @@ async function connectToMongo() {
   return db;
 }
 
+// mongo.js addition
+async function closeMongoConnection() {
+  if (client.isConnected()) {
+    await client.close();
+    console.log('✅ MongoDB connection closed');
+  }
+}
+
+
+
+
 module.exports = {
   connectToMongo,
   getCollection: async (collectionName) => {
     const database = await connectToMongo();
     return database.collection(collectionName);
   },
+  closeMongoConnection,
 };

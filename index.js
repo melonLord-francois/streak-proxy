@@ -1,7 +1,8 @@
 // atlas cluster creds
 // fboulou_db_user
-// JtyrRZjbWwwMP02D
+// 
 
+const { closeMongoConnection } = require('./mongo');
 
 require('dotenv').config(); // Make sure this is at the top
 const { getCollection } = require('./mongo'); // Or adjust path if different
@@ -204,5 +205,18 @@ app.post('/schedule-revoke', express.json(), async (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Streak proxy running on port ${PORT}`);
+});
+
+// Graceful shutdown for Render (and local)
+process.on('SIGINT', async () => {
+  console.log('🔌 SIGINT received – closing Mongo connection...');
+  await closeMongoConnection();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('🔌 SIGTERM received – closing Mongo connection...');
+  await closeMongoConnection();
+  process.exit(0);
 });
 
